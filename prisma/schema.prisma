@@ -1,0 +1,119 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectEstado {
+  BORRADOR
+  EN_PROGRESO
+  PAUSADO
+  FINALIZADO
+  CANCELADO
+}
+
+enum TaskEstado {
+  PENDIENTE
+  EN_PROGRESO
+  HECHA
+  BLOQUEADA
+}
+
+model Usuario {
+  id            Int               @id @default(autoincrement())
+  nombre        String
+  email         String            @unique
+  proyectos     ProyectoMiembro[]
+  creadoEn      DateTime          @default(now())
+  actualizadoEn DateTime          @updatedAt
+  Proyecto      Proyecto[]
+  Tarea         Tarea[]
+
+  @@map("Usuario")
+}
+
+model Proyecto {
+  id            Int                @id @default(autoincrement())
+  nombre        String             @unique
+  descripcion   String?
+  estado        ProjectEstado      @default(BORRADOR)
+  fechaInicio   DateTime?
+  fechaFin      DateTime?
+  ownerId       Int
+  owner         Usuario            @relation(fields: [ownerId], references: [id], onDelete: Restrict)
+  tareas        Tarea[]
+  miembros      ProyectoMiembro[]
+  etiquetas     ProyectoEtiqueta[]
+  creadoEn      DateTime           @default(now())
+  actualizadoEn DateTime           @updatedAt
+
+  @@index([estado])
+  @@map("Proyecto")
+}
+
+model Tarea {
+  id            Int        @id @default(autoincrement())
+  titulo        String
+  descripcion   String?
+  estado        TaskEstado @default(PENDIENTE)
+  proyectoId    Int
+  proyecto      Proyecto   @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  asignadoAId   Int?
+  asignadoA     Usuario?   @relation(fields: [asignadoAId], references: [id], onDelete: SetNull)
+  creadoEn      DateTime   @default(now())
+  actualizadoEn DateTime   @updatedAt
+
+  @@index([proyectoId, estado])
+  @@map("Tarea")
+}
+
+model ProyectoMiembro {
+  proyectoId Int
+  usuarioId  Int
+  rol        String
+
+  proyecto Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  usuario  Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@id([proyectoId, usuarioId])
+  @@map("ProyectoMiembro")
+}
+
+model Etiqueta {
+  id        Int                @id @default(autoincrement())
+  nombre    String             @unique
+  color     String?
+  proyectos ProyectoEtiqueta[]
+
+  @@map("Etiqueta")
+}
+
+model ProyectoEtiqueta {
+  proyectoId Int
+  etiquetaId Int
+
+  proyecto Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  etiqueta Etiqueta @relation(fields: [etiquetaId], references: [id], onDelete: Cascade)
+
+  @@id([proyectoId, etiquetaId])
+  @@map("ProyectoEtiqueta")
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  tabla      String
+  accion     String
+  registroId String
+  oldData    Json?
+  newData    Json?
+  actorId    Int?
+  ocurridoEn DateTime @default(now())
+
+  @@index([tabla, ocurridoEn])
+  @@map("AuditLog")
+}
