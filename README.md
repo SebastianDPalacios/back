@@ -1,7 +1,7 @@
 
 # API Proyectos (Node + Express + Prisma + PostgreSQL + Swagger)
 
-CRUD de **Proyectos** y **Usuarios (owners)** con agregados, auditoría via **triggers** y un endpoint de **análisis con IA** (Gemini/DeepSeek, opcional). Incluye documentación OpenAPI en `/docs` y despliegue con Docker Compose.
+CRUD de **Proyectos** y **Usuarios (owners)** con agregados, auditoría via **triggers** y un endpoint de **análisis con IA** . Incluye documentación OpenAPI en `/docs` y despliegue con Docker Compose.
 
 ---
 
