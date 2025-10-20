@@ -16,7 +16,7 @@ CRUD de **Proyectos** y **Usuarios (owners)** con agregados, auditoría via **tr
 
 ---
 
-## 🚀 Quick Start (con Docker)
+##  Quick Start (con Docker)
 
 > Requisitos: Docker Desktop/Engine y Docker Compose.
 
